@@ -7,6 +7,11 @@
           <package value="com.luxshan.linkshort.linkshort" />
         </packages>
       </persistence-unit>
+      <persistence-unit moduleName="snapify" name="Default">
+        <packages>
+          <package value="com.luxshan.snapify" />
+        </packages>
+      </persistence-unit>
     </persistence-units>
   </component>
 </project>
