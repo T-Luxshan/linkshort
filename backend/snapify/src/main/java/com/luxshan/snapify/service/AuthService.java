@@ -1,7 +1,9 @@
 package com.luxshan.snapify.service;
 
+import com.luxshan.snapify.dto.LoginRequest;
 import com.luxshan.snapify.dto.RegisterRequest;
 import com.luxshan.snapify.exception.EmailAlreadyExistsException;
+import com.luxshan.snapify.exception.InvalidCredentialsException;
 import com.luxshan.snapify.model.User;
 import com.luxshan.snapify.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,5 +38,23 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    public void login(LoginRequest request) {
+        String email = request.getEmail()
+                .trim()
+                .toLowerCase(Locale.ROOT);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("Invalid email or password")
+                );
+        boolean passwordMatches = passwordEncoder.matches(
+                request.getPassword(),
+                user.getPasswordHash()
+        );
+        if (!passwordMatches) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
     }
 }
