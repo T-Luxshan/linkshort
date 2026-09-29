@@ -1,5 +1,6 @@
 package com.luxshan.snapify.controller;
 
+import com.luxshan.snapify.dto.LoginRequest;
 import com.luxshan.snapify.dto.RegisterRequest;
 import com.luxshan.snapify.service.AuthService;
 import jakarta.validation.Valid;
@@ -18,5 +19,11 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public void register(@Valid @RequestBody RegisterRequest request){
         authService.register(request);
+    }
+
+    @GetMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public void login(@Valid @RequestBody LoginRequest request){
+        authService.login(request);
     }
 }
