@@ -19,6 +19,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public void register(RegisterRequest request){
 
@@ -40,7 +41,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public void login(LoginRequest request) {
+    public String login(LoginRequest request) {
         String email = request.getEmail()
                 .trim()
                 .toLowerCase(Locale.ROOT);
@@ -56,5 +57,6 @@ public class AuthService {
         if (!passwordMatches) {
             throw new InvalidCredentialsException("Invalid email or password");
         }
+        return jwtService.generateToken(user);
     }
 }
