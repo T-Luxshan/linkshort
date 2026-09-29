@@ -24,11 +24,8 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
-    private final UserRepository userRepository;
 
-    public JwtService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+
 
     // Generate signing key
     private SecretKey getSigningKey() {
@@ -65,8 +62,7 @@ public class JwtService {
                 .getPayload();
     }
 
-    // TODO: Validate JWT
-
+    // Validate JWT
     public boolean isTokenValid(String token, User user) {
 
         try {
