@@ -2,17 +2,14 @@
 package com.luxshan.snapify.service;
 
 import com.luxshan.snapify.model.User;
-import com.luxshan.snapify.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-
 import java.util.Base64;
 import java.util.Date;
 
