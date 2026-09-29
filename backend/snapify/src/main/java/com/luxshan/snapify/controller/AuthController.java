@@ -1,6 +1,7 @@
 package com.luxshan.snapify.controller;
 
 import com.luxshan.snapify.dto.LoginRequest;
+import com.luxshan.snapify.dto.LoginResponse;
 import com.luxshan.snapify.dto.RegisterRequest;
 import com.luxshan.snapify.service.AuthService;
 import jakarta.validation.Valid;
@@ -23,7 +24,12 @@ public class AuthController {
 
     @GetMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public void login(@Valid @RequestBody LoginRequest request){
-        authService.login(request);
+    public LoginResponse login(@Valid @RequestBody LoginRequest request){
+        String token = authService.login(request);
+        return LoginResponse.builder()
+                .accessToken(token)
+                .tokenType("Bearer")
+                .expiresIn(3600)
+                .build();
     }
 }
