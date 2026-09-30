@@ -38,8 +38,15 @@ public class SecurityConfig {
 
                 .httpBasic(basic -> basic.disable())
 
-                .authorizeHttpRequests(auth ->
-                        auth.anyRequest().permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/**", "/api/links/r/**")
+                        .permitAll()
+
+//                        .requestMatchers("/api/links/r/**")
+//                        .permitAll()
+
+                        .anyRequest()
+                        .authenticated()
                 )
 
                 .addFilterBefore(
