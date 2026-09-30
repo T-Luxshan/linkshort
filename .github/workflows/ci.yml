@@ -47,4 +47,6 @@ jobs:
 
       - name: Build backend
         working-directory: backend/snapify
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: ./mvnw clean verify

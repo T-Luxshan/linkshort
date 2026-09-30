@@ -32,3 +32,7 @@ management:
 
 app:
   base-url: http://localhost:8080
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000 # 1 hour in milliseconds
