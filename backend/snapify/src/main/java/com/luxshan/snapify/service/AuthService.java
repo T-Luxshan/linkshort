@@ -21,7 +21,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public void register(RegisterRequest request){
+    public String register(RegisterRequest request){
 
         String email = request.getEmail()
                 .trim()
@@ -38,7 +38,8 @@ public class AuthService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return jwtService.generateToken(savedUser);
     }
 
     public String login(LoginRequest request) {
