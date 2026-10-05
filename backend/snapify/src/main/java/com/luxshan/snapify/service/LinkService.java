@@ -12,6 +12,9 @@ import com.luxshan.snapify.util.ShortCodeGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.luxshan.snapify.model.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -35,6 +38,11 @@ public class LinkService {
     // Create a new link
     public LinkResponse createLink(CreateLinkRequest request){
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        User currentUser = (User) authentication.getPrincipal();
+
         String shortCode = shortCodeGenerator.generate();
 
         int attempts = 1;
@@ -52,6 +60,7 @@ public class LinkService {
                 .createdAt(LocalDateTime.now())
                 .active(true)
                 .expiresAt(request.getExpiresAt())
+                .user(currentUser)
                 .build();
         linkRepository.save(link);
         return toResponse(link);
