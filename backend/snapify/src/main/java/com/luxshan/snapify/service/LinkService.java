@@ -3,18 +3,19 @@ package com.luxshan.snapify.service;
 import com.luxshan.snapify.dto.CachedLink;
 import com.luxshan.snapify.dto.CreateLinkRequest;
 import com.luxshan.snapify.dto.LinkResponse;
+import com.luxshan.snapify.exception.AccessDeniedException;
 import com.luxshan.snapify.exception.LinkExpiredException;
 import com.luxshan.snapify.exception.LinkNotFoundException;
 import com.luxshan.snapify.exception.ShortCodeGenerationException;
 import com.luxshan.snapify.model.Link;
+import com.luxshan.snapify.model.User;
 import com.luxshan.snapify.repository.LinkRepository;
 import com.luxshan.snapify.util.ShortCodeGenerator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.luxshan.snapify.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -83,15 +84,17 @@ public class LinkService {
     // Delete a link by short code
     @Transactional
     public void deleteLink(String shortCode){
-//        if(!linkRepository.existsByShortCode(shortCode)) {
-//            throw new LinkNotFoundException("Short link not found: " + shortCode);
-//        }
-        int deleted = linkRepository.deleteByShortCode(shortCode);
+        Link link = linkRepository.findByShortCode(shortCode)
+                .orElseThrow(() -> new LinkNotFoundException("Short link not found: " + shortCode));
 
-        if (deleted == 0) {
-            throw new LinkNotFoundException("Short link not found: " + shortCode);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User currentUser = (User) authentication.getPrincipal();
+
+        if (!currentUser.getId().equals(link.getUser().getId())) {
+            throw new AccessDeniedException("This deletion is Unauthorized");
         }
-
+        linkRepository.deleteByShortCode(shortCode);
         String cacheKey = redisService.buildLinkKey(shortCode);
         redisService.delete(cacheKey);
     }
