@@ -39,10 +39,8 @@ public class LinkService {
     // Create a new link
     public LinkResponse createLink(CreateLinkRequest request){
 
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
 
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = getAuthenticatedUser();
 
         String shortCode = shortCodeGenerator.generate();
 
@@ -78,6 +76,11 @@ public class LinkService {
         if(!link.isActive()) {
             throw new LinkNotFoundException("Short link not found: " + shortCode);
         }
+
+        User currentUser = getAuthenticatedUser();
+        if (link.getUser() == null || !currentUser.getId().equals(link.getUser().getId())) {
+            throw new AccessDeniedException("You do not have permission to access this link");
+        }
         return toResponse(link);
     }
 
@@ -87,9 +90,8 @@ public class LinkService {
         Link link = linkRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new LinkNotFoundException("Short link not found: " + shortCode));
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        User currentUser = (User) authentication.getPrincipal();
+        User currentUser = getAuthenticatedUser();
 
         if (!currentUser.getId().equals(link.getUser().getId())) {
             throw new AccessDeniedException("This deletion is Unauthorized");
@@ -155,5 +157,10 @@ public class LinkService {
         if (expiresAt != null && expiresAt.isBefore(LocalDateTime.now())) {
             throw new LinkExpiredException("Short link is expired: " + shortCode);
         }
+    }
+
+    private User getAuthenticatedUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return  (User) authentication.getPrincipal();
     }
 }
